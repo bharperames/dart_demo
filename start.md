@@ -115,6 +115,8 @@ Analyzing lib, web...                  0.4s
 
 ![Cursor MCP Settings pane showing the dart-tooling MCP server with a green circle indicating a successful connection and tools enabled](/Users/brettharper/.gemini/antigravity/brain/89f406e3-7ee7-4375-aada-76c4f2850400/media__1772989752574.png)
 
+> **Verification Check:** Notice the text **"25 tools, 1 prompts enabled"** in the screenshot above. This is your absolute confirmation that the Dart Tooling Daemon (DTD) has successfully booted up, verified your path, and dynamically passed its `Analyze`, `Fix`, and `Format` capabilities directly to the Cursor IDE agent!
+
 ### Agent Testing Workflow
 
 Now that the MCP is attached, you can test the migration!
