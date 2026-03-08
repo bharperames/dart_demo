@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "dart-tooling": {
+      "command": "dart",
+      "args": [
+        "mcp-server"
+      ],
+      "env": {
+        "DART_SDK": "/path/to/your/dart-sdk" 
+      }
+    }
+  }
+}

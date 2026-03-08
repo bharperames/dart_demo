@@ -1,0 +1,25 @@
+# Dart 3 Migration Rules for React-Dart Codebase
+
+You are an expert Dart developer tasked with migrating a legacy Dart codebase to sound null safety (Dart 3+). 
+
+## Core Directives
+1. **NO FLUTTER:** This is a pure Dart web application using React wrappers. Do not import `package:flutter`, use `Widget` classes, or apply Flutter state management paradigms.
+2. **USE THE MCP:** Before finalizing any migration, you must use the Dart MCP server to run `dart analyze` on the file. Do not guess types. Read the analyzer output, fix the nullability mismatches, and re-run until the file passes.
+
+## React-Specific Null Safety Rules
+When migrating React components (e.g., classes interacting with `package:react` or `package:over_react`):
+
+* **The `late` Keyword for Lifecycle Injection:** Do NOT make component `props`, `state`, or `jsThis` nullable (`?`) simply because they are uninitialized at class declaration. The React wrapper injects these before `componentDidMount`. 
+  * **Incorrect:** `Map? props;`
+  * **Correct:** `late Map props;`
+
+* **Mixin Class Modifiers:** Dart 3 prohibits using standard abstract classes as mixins. Search for abstract classes being utilized with the `with` keyword to share component lifecycle logic.
+  * **Action:** Convert these legacy declarations from `abstract class MyMixin` to `abstract mixin class MyMixin` or `mixin MyMixin`.
+
+* **React JS Interop:**
+  Ensure any HTML entry points or interop bindings point to React 18 standards, as older React 17 JS files are deprecated in Dart 3-compatible wrapper versions.
+
+## Testing Upgrades
+When migrating files in the `/test` directory:
+* Automatically sweep for legacy `package:matcher` syntax.
+* Convert old assertions (e.g., `expect(value, isNull)`) to the modern Dart 3 `package:checks` API (e.g., `check(value).isNull()`).

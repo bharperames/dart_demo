@@ -1,0 +1,1 @@
+{"isEntrypoint":true,"deps":["react|lib/react_client.dart","react|lib/react_dom.dart","dart_react_todo|lib/todo_app.dart"],"parts":[],"conditionalDeps":[],"sdkDeps":["html"],"hasMain":true}
