@@ -117,9 +117,46 @@ Analyzing lib, web...                  0.4s
 
 > **Verification Check:** Notice the text **"25 tools, 1 prompts enabled"** in the screenshot above. This is your absolute confirmation that the Dart Tooling Daemon (DTD) has successfully booted up, verified your path, and dynamically passed its `Analyze`, `Fix`, and `Format` capabilities directly to the Cursor IDE agent!
 
-### Agent Testing Workflow
 
-Now that the MCP is attached, you can test the migration!
+## ============= STEP 6: AI Governance via `.cursorrules`
+
+When an AI agent (like Cursor limits or Composer) reads a `.dart` file, it overwhelmingly assumes the code belongs to a Flutter application. Because Flutter widgets initialize their state immediately, agents will stubbornly try to make your uninitialized React wrapper variables nullable (e.g., `String?`). This forces your team to write messy `!` null-checks everywhere. 
+
+To prevent these hallucinations, we place a `.cursorrules` file **directly in the root of the project repository** (`/.cursorrules`). Cursor automatically ingests this file at the start of every chat session to establish hard constraints on how the AI can modify the codebase.
+
+Here are the strict contents of the `.cursorrules` we generated for this project to ensure it enforces React lifecycle rules and utilizes the Dart MCP:
+
+```markdown
+# Dart 3 Migration Rules for React-Dart Codebase
+
+You are an expert Dart developer tasked with migrating a legacy Dart codebase to sound null safety (Dart 3+). 
+
+## Core Directives
+1. **NO FLUTTER:** This is a pure Dart web application using React wrappers. Do not import `package:flutter`, use `Widget` classes, or apply Flutter state management paradigms.
+2. **USE THE MCP:** Before finalizing any migration, you must use the Dart MCP server to run `dart analyze` on the file. Do not guess types. Read the analyzer output, fix the nullability mismatches, and re-run until the file passes.
+
+## React-Specific Null Safety Rules
+When migrating React components (e.g., classes interacting with `package:react` or `package:over_react`):
+
+* **The `late` Keyword for Lifecycle Injection:** Do NOT make component `props`, `state`, or `jsThis` nullable (`?`) simply because they are uninitialized at class declaration. The React wrapper injects these before `componentDidMount`. 
+  * **Incorrect:** `Map? props;`
+  * **Correct:** `late Map props;`
+
+* **Mixin Class Modifiers:** Dart 3 prohibits using standard abstract classes as mixins. Search for abstract classes being utilized with the `with` keyword to share component lifecycle logic.
+  * **Action:** Convert these legacy declarations from `abstract class MyMixin` to `abstract mixin class MyMixin` or `mixin MyMixin`.
+
+* **React JS Interop:**
+  Ensure any HTML entry points or interop bindings point to React 18 standards, as older React 17 JS files are deprecated in Dart 3-compatible wrapper versions.
+
+## Testing Upgrades
+When migrating files in the `/test` directory:
+* Automatically sweep for legacy `package:matcher` syntax.
+* Convert old assertions (e.g., `expect(value, isNull)`) to the modern Dart 3 `package:checks` API (e.g., `check(value).isNull()`).
+```
+
+## ============= STEP 7: Agent Testing Workflow
+
+Now that the MCP is attached and your rules are governing the AI logic, you can safely test the migration!
 
 1. Open `lib/todo_app.dart` in Cursor.
 2. Open the **Cursor Composer** (Cmd+I) or **Cursor Chat** (Cmd+L).
