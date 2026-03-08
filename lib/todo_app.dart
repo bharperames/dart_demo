@@ -2,17 +2,17 @@ import 'package:react/react.dart' as react;
 
 var TodoApp = react.registerComponent(() => new _TodoApp());
 
-// Legacy Dart 2 React pattern: Using abstract classes as mixins for lifecycle hooks
-abstract class LifecycleLogger {
+// Dart 3: abstract classes used as mixins must be declared as mixin classes
+mixin LifecycleLogger {
   void componentWillMount() {
     print("Component will mount...");
   }
 }
 
 class _TodoApp extends react.Component with LifecycleLogger {
-  // Legacy Dart 2 pattern: uninitialized non-nullable types
-  String defaultText;
-  int clickCount;
+  // Dart 3: use 'late' for fields injected by React wrapper before componentDidMount
+  late String defaultText;
+  late int clickCount;
   Map getInitialState() => {
     'todos': [
       {'id': 1, 'text': 'Learn Dart', 'completed': true},
@@ -28,8 +28,8 @@ class _TodoApp extends react.Component with LifecycleLogger {
 
     List todos = new List.from(state['todos']);
     
-    // Legacy Dart 2 pattern: optional parameter without null safety
-    String formatTodoText([String prefix]) {
+    // Dart 3: optional parameters need explicit non-null default
+    String formatTodoText([String prefix = '']) {
       return prefix + ": " + newTodoText;
     }
     
