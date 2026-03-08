@@ -197,3 +197,44 @@ The agent will now use the MCP server to autonomously read the 4 errors we injec
 > *   **Optional parameter nullability** – Added an explicit default for the optional parameter in `formatTodoText` by changing `[String prefix]` to `[String prefix = '']` so it never implicitly defaults to null.
 > 
 > *`dart analyze` and the Dart MCP `analyze_files` both report no issues for `lib/todo_app.dart`.*
+
+### Expected Code Diff
+
+```diff
+diff --git a/lib/todo_app.dart b/lib/todo_app.dart
+index ef97496..8cfbe4e 100644
+--- a/lib/todo_app.dart
++++ b/lib/todo_app.dart
+@@ -2,17 +2,14 @@ import 'package:react/react.dart' as react;
+ 
+ var TodoApp = react.registerComponent(() => new _TodoApp());
+ 
+-// Legacy Dart 2 React pattern: Using abstract classes as mixins for lifecycle hooks
+-abstract class LifecycleLogger {
++// Dart 3: abstract mixin class for lifecycle hooks (standard abstract classes can't be mixins)
++abstract mixin class LifecycleLogger {
+   void componentWillMount() {
+     print("Component will mount...");
+   }
+ }
+ 
+ class _TodoApp extends react.Component with LifecycleLogger {
+-  // Legacy Dart 2 pattern: uninitialized non-nullable types
+-  String defaultText;
+-  int clickCount;
+   Map getInitialState() => {
+     'todos': [
+       {'id': 1, 'text': 'Learn Dart', 'completed': true},
+@@ -28,8 +25,7 @@ class _TodoApp extends react.Component with LifecycleLogger {
+ 
+     List todos = new List.from(state['todos']);
+     
+-    // Legacy Dart 2 pattern: optional parameter without null safety
+-    String formatTodoText([String prefix]) {
++    String formatTodoText([String prefix = '']) {
+       return prefix + ": " + newTodoText;
+     }
+```
+
+### Bonus: Unit Test Migration
+In addition to the main code, we have provided a legacy Dart 2 unit test at `test/todo_app_test.dart` that uses the deprecated `package:matcher`. You can run `make test-unit-dart3` to see it compile to Dart 3 but flag the old API. When you point the Cursor Agent to this file, it will natively convert `expect(value, isNull)` into the modern `check(value).isNull()` format defined in our `.cursorrules`!
