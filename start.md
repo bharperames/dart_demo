@@ -60,3 +60,53 @@ Running `dart analyze` now correctly outputs these strict Dart 3 migration error
 - `missing_default_value_for_parameter`: Added an optional string parameter `[String prefix]` without a default, which the agent must fix by changing to `String?`.
 
 This is a fantastic starting point for testing the migration agent! Let me know when you are ready to move on to configuring the agent.
+
+
+## ============= STEP 3:  The errors
+
+brettharper@Bretts-MacBook-Pro dart_test % make analyze-dart3
+--- Analyzing with global Dart 3 SDK ---
+Note: It is expected that this fails and outputs migration errors.
+dart analyze lib web
+Analyzing lib, web...                  0.4s
+
+  error • lib/todo_app.dart:12:45 • The class 'LifecycleLogger' can't be used as a mixin because it's neither a mixin class
+          nor a mixin. • class_used_as_mixin
+  error • lib/todo_app.dart:14:10 • Non-nullable instance field 'defaultText' must be initialized. Try adding an
+          initializer expression, or a generative constructor that initializes it, or mark it 'late'. •
+          not_initialized_non_nullable_instance_field
+  error • lib/todo_app.dart:15:7 • Non-nullable instance field 'clickCount' must be initialized. Try adding an initializer
+          expression, or a generative constructor that initializes it, or mark it 'late'. •
+          not_initialized_non_nullable_instance_field
+  error • lib/todo_app.dart:32:35 • The parameter 'prefix' can't have a value of 'null' because of its type, but the implicit
+          default value is 'null'. Try adding an explicit non-'null' default value. •
+          missing_default_value_for_parameter
+
+
+## ============= STEP 4: Configuring Cursor for MCP Migration
+
+1. **Open Cursor Settings:**
+   Press `Cmd + ,` (Mac) or `Ctrl + ,` (Windows/Linux) to open the Cursor Settings menu.
+2. **Navigate to Features -> MCP:**
+   In the left-hand sidebar of the settings menu, look for "Features" and then click on "MCP" (Model Context Protocol).
+3. **Add a New MCP Server:**
+   Click the **"+ Add New MCP Server"** button.
+4. **Configure the Server Details:**
+   Fill out the modal with the following details:
+   *   **Name:** `dart-tooling`
+   *   **Type:** Select `command`
+   *   **Command:** Enter the following exact command (using the absolute path to the global Dart 3 instance):
+       `/opt/homebrew/opt/dart/libexec/bin/dart mcp-server`
+5. **Save and Verify:**
+   Click "Save". Cursor should show a green indicator next to the `dart-tooling` server, confirming it is connected and tools are available.
+
+### Agent Testing Workflow
+
+Now that the MCP is attached, you can test the migration!
+
+1. Open `lib/todo_app.dart` in Cursor.
+2. Open the **Cursor Composer** (Cmd+I) or **Cursor Chat** (Cmd+L).
+3. Use this prompt:
+   > "Use the Dart MCP to analyze `lib/todo_app.dart`. Fix the null-safety and mixin errors, making sure to follow the `.cursorrules` regarding React state and uninitialized variables. Re-analyze after your changes to guarantee it passes."
+
+The agent will now use the MCP server to autonomously read the 4 errors we injected, apply the `late` keyword, fix the mixin syntax, and verify the compilation before completing the response!
