@@ -238,3 +238,10 @@ index ef97496..8cfbe4e 100644
 
 ### Bonus: Unit Test Migration
 In addition to the main code, we have provided a legacy Dart 2 unit test at `test/todo_app_test.dart` that uses the deprecated `package:matcher`. You can run `make test-unit-dart3` to see it compile to Dart 3 but flag the old API. When you point the Cursor Agent to this file, it will natively convert `expect(value, isNull)` into the modern `check(value).isNull()` format defined in our `.cursorrules`!
+
+### Playground Infrastructure Summary
+* **Legacy Unit Tests Added**: I added `test/todo_app_test.dart`, which uses the deprecated `package:matcher` assertions. This verifies the agent obeys the `.cursorrules` directive to convert `expect()` to the Dart 3 `package:checks` API.
+* **Makefile Streamlined**: We now have a clean `test-unit-dart3` command that isolates test failures specifically for the agent to resolve.
+* **Git Tag Synced**: I updated the `v1.0.0-dart3-ready` tag one final time. Anyone who checks out that tag will receive the perfect playground: comprehensive `start.md` documentation, explicitly un-migrated code, and legacy tests.
+
+The entire package is fully assembled on the `main` branch. Run `make analyze-dart3` or `make test-unit-dart3` locally to see the exact errors the agent will resolve for you when you point it at Cursor!
